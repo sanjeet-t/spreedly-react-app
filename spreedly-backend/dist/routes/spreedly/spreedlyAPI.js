@@ -13,23 +13,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-class SpreedlyAxiosAPI {
+class SpreedlyAPI {
     constructor(config) {
         this.username = config.SPREEDLY_USERNAME;
         this.password = config.SPREEDLY_PASSWORD;
         this.gatewayToken = config.SPREEDLY_GATEWAY_TOKEN;
     }
-    getGatewayToken() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const gatewayURL = `https://core.spreedly.com/v1/gateways.json`;
-            return yield axios_1.default.post(gatewayURL, {}, {
-                auth: {
-                    username: this.username,
-                    password: this.password
-                }
-            });
-        });
-    }
+    // async getGatewayToken() {
+    //   const gatewayURL = `https://core.spreedly.com/v1/gateways.json`;
+    //   return await axios.post(
+    //     gatewayURL,
+    //     {},
+    //     {
+    //       auth: {
+    //         username: this.username,
+    //         password: this.password
+    //       }
+    //     }
+    //   );
+    // }
     fullRefund(token) {
         return __awaiter(this, void 0, void 0, function* () {
             const refundURL = `https://core.spreedly.com/v1/transactions/${token}/credit.json`;
@@ -70,5 +72,5 @@ class SpreedlyAxiosAPI {
         });
     }
 }
-exports.SpreedlyAxiosAPI = SpreedlyAxiosAPI;
-//# sourceMappingURL=spreedlyAxios.js.map
+exports.SpreedlyAPI = SpreedlyAPI;
+//# sourceMappingURL=spreedlyAPI.js.map

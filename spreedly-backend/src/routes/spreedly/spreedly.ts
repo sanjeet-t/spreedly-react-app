@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import config from '../../config.json';
-// const axios = require('axios').default;
-import axios from 'axios';
+import { SpreedlyAPI } from './spreedlyAPI';
+
+const spreedlyAPI = new SpreedlyAPI(config);
 
 const spreedlyRouter = Router();
-
-import { spreedlyAPI, testGateWayToken } from './spreedyAPI';
 
 spreedlyRouter.get('/', (req, res) => {
   return res.status(200).send('Spreedy route OK');
@@ -14,16 +13,10 @@ spreedlyRouter.get('/', (req, res) => {
 spreedlyRouter.post('/preauth', async (req, res) => {
   const { data: token } = req.body;
   try {
-    const preauth = await spreedlyAPI.authorize.create(testGateWayToken, {
-      transaction: {
-        payment_method_token: token,
-        amount: 100,
-        currency_code: 'USD'
-      }
-    });
-    return res.status(200).send(preauth);
+    const preauth = await spreedlyAPI.preauth(token, 100, 'USD');
+    return res.status(200).send(preauth.data);
   } catch (e) {
-    console.error(`Spreedly preauth error : ${JSON.stringify(e)}`);
+    console.error(`Spreedly preauth error : ${e}`);
     return res.status(400).send(e);
   }
 });
@@ -31,32 +24,22 @@ spreedlyRouter.post('/preauth', async (req, res) => {
 spreedlyRouter.post('/capture', async (req, res) => {
   const { data: token } = req.body;
   try {
-    const capture = await spreedlyAPI.capture.fullAmount(token);
-    return res.status(200).send(capture);
+    const capture = await spreedlyAPI.capture(token);
+    return res.status(200).send(capture.data);
   } catch (e) {
-    console.error(`Spreedly capture error : ${JSON.stringify(e)}`);
+    console.error(`Spreedly capture error : ${e}`);
     return res.status(400).send(e);
   }
 });
 
 spreedlyRouter.post('/refund', async (req, res) => {
   const { data: token } = req.body;
-  const refundUrl = `https://core.spreedly.com/v1/transactions/${token}/credit.json`;
   try {
-    const response = await axios.post(
-      refundUrl,
-      {},
-      {
-        auth: {
-          username: config.SPREEDLY_USERNAME,
-          password: config.SPREEDLY_PASSWORD
-        }
-      }
-    );
-    return res.status(200).send(response.data);
+    const refund = await spreedlyAPI.fullRefund(token);
+    return res.status(200).send(refund.data);
   } catch (e) {
-    console.log(e);
-    return res.status(400).send(e.message);
+    console.error(`Spreedly refund error : ${e}`);
+    return res.status(400).send(e);
   }
 });
 

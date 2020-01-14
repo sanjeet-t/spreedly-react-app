@@ -17,8 +17,6 @@ const methodTypes = {
 
 const Transactions = props => {
   const { payments, handleRefund } = props;
-  console.log(`In transactions page...`);
-  console.log(payments);
   return (
     <React.Fragment>
       <Container>

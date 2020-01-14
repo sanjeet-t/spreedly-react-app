@@ -22,6 +22,7 @@ export const loginUser = creds => async dispatch => {
     dispatch({ type: LOGIN_USER, payload: response.data.userId });
   } catch (e) {
     dispatch({ type: LOGIN_USER_FAIL, payload: e.message });
+    throw e;
   }
 };
 
@@ -38,35 +39,40 @@ export const setCardToken = (cardToken, methodType) => dispatch => {
 export const performPayment = token => async (dispatch, getState) => {
   const preauthURL = API_URL + '/spreedly/preauth';
   const captureURL = API_URL + '/spreedly/capture';
-  let response;
+  let preauthRes, captureRes;
+  // preauth
   try {
-    // preauth
     console.log(`Performing preauth...`);
-    response = await httpService.post(preauthURL, {
+    preauthRes = await httpService.post(preauthURL, {
       data: token
     });
+    dispatch({ type: PAYMENT_PREAUTH, payload: preauthRes.data });
+  } catch (e) {
+    console.log(`Preauth error...`);
+    dispatch({ type: PAYMENT_ERROR, payload: e.message });
+    throw e;
+  }
 
-    dispatch({ type: PAYMENT_PREAUTH, payload: response.data });
-
-    // capture
+  // capture
+  try {
     console.log(`Performing capture...`);
-    const { transaction } = response.data;
-    response = await httpService.post(captureURL, {
+    const { transaction } = preauthRes.data;
+    captureRes = await httpService.post(captureURL, {
       data: transaction.token
     });
-
-    dispatch({ type: PAYMENT_CAPTURE, payload: response.data });
-
-    // update payment
-    const payment = getState().payment;
-    dispatch({ type: ADD_TRANSACTION, payload: payment });
+    dispatch({ type: PAYMENT_CAPTURE, payload: captureRes.data });
   } catch (e) {
+    console.log(`Capture error...`);
     dispatch({ type: PAYMENT_ERROR, payload: e.message });
+    throw e;
   }
+
+  const payment = getState().payment;
+  dispatch({ type: ADD_TRANSACTION, payload: payment });
 };
 
 export const refundTransaction = preauthToken => async dispatch => {
-  console.log(`In refund action creation`);
+  console.log(`Refunding transaction...`);
   const refundURL = API_URL + '/spreedly/refund';
   try {
     const response = await httpService.post(refundURL, {

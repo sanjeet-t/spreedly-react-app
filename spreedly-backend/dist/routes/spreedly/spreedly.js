@@ -13,56 +13,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const express_1 = require("express");
 const config_json_1 = __importDefault(require("../../config.json"));
-// const axios = require('axios').default;
-const axios_1 = __importDefault(require("axios"));
+const spreedlyAPI_1 = require("./spreedlyAPI");
+const spreedlyAPI = new spreedlyAPI_1.SpreedlyAPI(config_json_1.default);
 const spreedlyRouter = express_1.Router();
-const spreedyAPI_1 = require("./spreedyAPI");
 spreedlyRouter.get('/', (req, res) => {
     return res.status(200).send('Spreedy route OK');
 });
 spreedlyRouter.post('/preauth', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: token } = req.body;
     try {
-        const preauth = yield spreedyAPI_1.spreedlyAPI.authorize.create(spreedyAPI_1.testGateWayToken, {
-            transaction: {
-                payment_method_token: token,
-                amount: 100,
-                currency_code: 'USD'
-            }
-        });
-        return res.status(200).send(preauth);
+        const preauth = yield spreedlyAPI.preauth(token, 100, 'USD');
+        return res.status(200).send(preauth.data);
     }
     catch (e) {
-        console.error(`Spreedly preauth error : ${JSON.stringify(e)}`);
+        console.error(`Spreedly preauth error : ${e}`);
         return res.status(400).send(e);
     }
 }));
 spreedlyRouter.post('/capture', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: token } = req.body;
     try {
-        const capture = yield spreedyAPI_1.spreedlyAPI.capture.fullAmount(token);
-        return res.status(200).send(capture);
+        const capture = yield spreedlyAPI.capture(token);
+        return res.status(200).send(capture.data);
     }
     catch (e) {
-        console.error(`Spreedly capture error : ${JSON.stringify(e)}`);
+        console.error(`Spreedly capture error : ${e}`);
         return res.status(400).send(e);
     }
 }));
 spreedlyRouter.post('/refund', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: token } = req.body;
-    const refundUrl = `https://core.spreedly.com/v1/transactions/${token}/credit.json`;
     try {
-        const response = yield axios_1.default.post(refundUrl, {}, {
-            auth: {
-                username: config_json_1.default.SPREEDLY_USERNAME,
-                password: config_json_1.default.SPREEDLY_PASSWORD
-            }
-        });
-        return res.status(200).send(response.data);
+        const refund = yield spreedlyAPI.fullRefund(token);
+        return res.status(200).send(refund.data);
     }
     catch (e) {
-        console.log(e);
-        return res.status(400).send(e.message);
+        console.error(`Spreedly refund error : ${e}`);
+        return res.status(400).send(e);
     }
 }));
 module.exports = spreedlyRouter;

@@ -93,11 +93,8 @@ class SpreedlyCreditCard extends Component {
       this.props.setCardToken(token, 'credit-card');
       try {
         await this.props.performPayment(token);
-        that.setState({ paymentErrors: false });
         that.setState({ paymentCaptured: true });
-        // const payment = this.props.payment;
-        // console.log(`Payment success`);
-        // this.props.addTransaction(payment, transactions);
+        that.setState({ paymentErrors: [] });
       } catch (e) {
         console.error(`Cannot complete payment : ${e.message}`);
         that.setState({ paymentErrors: [e] });
