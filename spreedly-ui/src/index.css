@@ -1,0 +1,9 @@
+body {
+  background-color: rgba(10, 10, 12, 0.733);
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
