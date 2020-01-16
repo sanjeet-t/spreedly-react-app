@@ -10,7 +10,7 @@ export default class GooglePayService {
       type: 'PAYMENT_GATEWAY',
       parameters: {
         gateway: 'spreedly',
-        gatewayMerchantId: 'SPREEDLY_ENVIRONMENT_KEY' // 9LOCZRk9HeBm84jvnONUiFqBu0C
+        gatewayMerchantId: '9LOCZRk9HeBm84jvnONUiFqBu0C'
       }
     };
 
