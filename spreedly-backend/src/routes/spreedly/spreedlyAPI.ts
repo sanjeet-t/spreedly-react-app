@@ -4,13 +4,24 @@ export class SpreedlyAPI {
   username: string;
   password: string;
   gatewayToken: string;
+  preauthCommand: any;
 
   constructor(config) {
     this.username = config.SPREEDLY_USERNAME;
     this.password = config.SPREEDLY_PASSWORD;
     this.gatewayToken = config.SPREEDLY_GATEWAY_TOKEN;
+    this.preauth = {
+      'credit-card': this.preauthCreditCard,
+      'google-pay': this.preauthGooglePay,
+      'apple-pay': this.preauthApplePay
+    };
   }
 
+  preauthCreditCard() {}
+
+  preauthGooglePay() {}
+
+  preauthApplePay() {}
   // async getGatewayToken() {
   //   const gatewayURL = `https://core.spreedly.com/v1/gateways.json`;
   //   return await axios.post(

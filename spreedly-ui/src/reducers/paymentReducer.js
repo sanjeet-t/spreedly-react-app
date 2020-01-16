@@ -20,6 +20,10 @@ export default (state = initialState, action) => {
       newState = { ...state };
       newState.preauthRes = action.payload;
       return newState;
+    case 'PAYMENT_PREAUTH_GOOGLE_PAY':
+      newState = { ...state };
+      newState.preauthRes = action.payload;
+      return newState;
     case 'PAYMENT_CAPTURE':
       newState = { ...state };
       newState.captureRes = action.payload;

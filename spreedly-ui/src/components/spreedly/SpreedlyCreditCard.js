@@ -151,7 +151,7 @@ class SpreedlyCreditCard extends Component {
                     }}
                   ></div>
                 </Form.Field>
-                <Form.Group>
+                <Form.Group widths="equal">
                   <Form.Field>
                     <input
                       id="month"
@@ -181,7 +181,6 @@ class SpreedlyCreditCard extends Component {
                       style={{
                         background: 'white',
                         height: '36px',
-                        width: '60px',
                         border: '1px solid grey',
                         borderRadius: '4px'
                       }}

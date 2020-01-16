@@ -11,7 +11,7 @@ spreedlyRouter.get('/', (req, res) => {
 });
 
 spreedlyRouter.post('/preauth', async (req, res) => {
-  const { data: token } = req.body;
+  const { data: token, method } = req.body;
   try {
     const preauth = await spreedlyAPI.preauth(token, 100, 'USD');
     return res.status(200).send(preauth.data);

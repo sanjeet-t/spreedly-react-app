@@ -6,6 +6,7 @@ import {
   PAYMENT_TOKENIZATION,
   PAYMENT_CAPTURE,
   PAYMENT_PREAUTH,
+  PAYMENT_PREAUTH_GOOGLE_PAY,
   PAYMENT_ERROR,
   ADD_TRANSACTION,
   REFUND_TRANSACTION
@@ -22,7 +23,6 @@ export const loginUser = creds => async dispatch => {
     dispatch({ type: LOGIN_USER, payload: response.data.userId });
   } catch (e) {
     dispatch({ type: LOGIN_USER_FAIL, payload: e.message });
-    throw e;
   }
 };
 
@@ -34,6 +34,42 @@ export const setCardToken = (cardToken, methodType) => dispatch => {
       methodType
     }
   });
+};
+
+export const performGooglePay = token => async (dispatch, getState) => {
+  const preauthURL = API_URL + '/spreedly/preauth-google-pay';
+  const captureURL = API_URL + '/spreedly/capture';
+
+  let preauthRes, captureRes;
+  // preauth
+  try {
+    console.log(`Performing preauth...`);
+    preauthRes = await httpService.post(preauthURL, {
+      data: token
+    });
+    dispatch({ type: PAYMENT_PREAUTH, payload: preauthRes.data });
+  } catch (e) {
+    console.log(`Preauth error...`);
+    dispatch({ type: PAYMENT_ERROR, payload: e.message });
+    throw e;
+  }
+
+  // capture
+  try {
+    console.log(`Performing capture...`);
+    const { transaction } = preauthRes.data;
+    captureRes = await httpService.post(captureURL, {
+      data: transaction.token
+    });
+    dispatch({ type: PAYMENT_CAPTURE, payload: captureRes.data });
+  } catch (e) {
+    console.log(`Capture error...`);
+    dispatch({ type: PAYMENT_ERROR, payload: e.message });
+    throw e;
+  }
+
+  const payment = getState().payment;
+  dispatch({ type: ADD_TRANSACTION, payload: payment });
 };
 
 export const performPayment = token => async (dispatch, getState) => {
