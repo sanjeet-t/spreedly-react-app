@@ -92,7 +92,13 @@ class SpreedlyCreditCard extends Component {
       console.log(`Tokenization success...`);
       this.props.setCardToken(token, 'credit-card');
       try {
-        await this.props.performPayment(token);
+        const paymentPayload = {
+          preauthToken: token,
+          amount: 100,
+          test: true,
+          currency: 'USD'
+        };
+        await this.props.performPayment(paymentPayload, 'credit-card');
         that.setState({ paymentCaptured: true });
         that.setState({ paymentErrors: [] });
       } catch (e) {

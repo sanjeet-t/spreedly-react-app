@@ -7,6 +7,10 @@ import GooglePayService from '../../services/googlePayService';
 import { setCardToken, performPayment } from '../../actions';
 
 class SpreedlyGooglePay extends Component {
+  state = {
+    buttonAdded: false
+  };
+
   componentDidMount() {
     this.googlePayService = new GooglePayService();
   }
@@ -18,14 +22,16 @@ class SpreedlyGooglePay extends Component {
 
     // google-pay button
     try {
+      const { buttonAdded } = this.state;
       const isGoogleReady = await this.paymentsClient.isReadyToPay(
         this.googlePayService.getReadyToPayRequest()
       );
-      if (isGoogleReady.result) {
+      if (isGoogleReady.result && !buttonAdded) {
         const button = this.paymentsClient.createButton({
           onClick: this.handleGooglePay
         });
         document.getElementById('container').appendChild(button);
+        this.setState({ buttonAdded: true });
       }
     } catch (e) {
       console.error(`Google pay not ready : ${e}`);
@@ -39,6 +45,9 @@ class SpreedlyGooglePay extends Component {
       const paymentData = await this.paymentsClient.loadPaymentData(
         paymentRequest
       );
+
+      console.log(paymentData);
+
       console.log(`Tokenized via google pay`);
       const paymentToken = JSON.parse(
         paymentData.paymentMethodData.tokenizationData.token
@@ -46,7 +55,14 @@ class SpreedlyGooglePay extends Component {
       console.log(paymentToken);
       this.props.setCardToken(paymentToken, 'google-pay');
 
-      await this.props.
+      // send to back-end
+      const paymentPayload = {
+        googleToken: paymentToken,
+        amount: 10,
+        currency: 'USD',
+        test: true
+      };
+      await this.props.performPayment(paymentPayload, 'google-pay');
     } catch (e) {
       console.error(`Cannot tokenize google pay : ${e}`);
     }
@@ -58,7 +74,7 @@ class SpreedlyGooglePay extends Component {
         console.log(`Google pay loaded in component`);
         this.setupGooglePay();
       }
-    }, 200);
+    }, 300);
   };
 
   render() {

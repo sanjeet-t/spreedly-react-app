@@ -5,11 +5,12 @@ export default class GooglePayService {
       apiVersionMinor: 0
     };
 
+    // 9LOCZRk9HeBm84jvnONUiFqBu0C
     this.tokenizationSpecification = {
       type: 'PAYMENT_GATEWAY',
       parameters: {
         gateway: 'spreedly',
-        gatewayMerchantId: '9LOCZRk9HeBm84jvnONUiFqBu0C'
+        gatewayMerchantId: 'SPREEDLY_ENVIRONMENT_KEY' // 9LOCZRk9HeBm84jvnONUiFqBu0C
       }
     };
 
@@ -58,14 +59,14 @@ export default class GooglePayService {
 
     paymentDataRequest.transactionInfo = {
       totalPriceStatus: 'FINAL',
-      totalPrice: '123.45',
+      totalPrice: '10.00',
       currencyCode: 'USD',
       countryCode: 'US'
     };
 
     paymentDataRequest.merchantInfo = {
-      merchantName: 'Ready',
-      merchantId: 'READY'
+      merchantName: 'Example Merchant',
+      merchantId: '01234567890123456789'
     };
 
     return paymentDataRequest;
